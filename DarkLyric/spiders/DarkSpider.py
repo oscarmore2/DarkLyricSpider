@@ -22,29 +22,33 @@ class DarkLyricSpider(CrawlSpider):
         
         rules = [Rule(sle(allow=("a.html")), follow=True, callback='parse_item')
                 ]
+                
 
         def parse_item(self, response):
             items = []
             sel = Selector(response)
             base_url = get_base_url(response)
             CollumBase = sel.css('div.artists')
-            ColumnLeft = CollumBase.css('div.fl')
+            ColumnLeft = CollumBase.css('div.fl').xpath("//a[starts-with(@href, 'a')]")
+            
             for site in ColumnLeft:
-                item = DarkLyricItem()
-                item['name'] = site.css('//a[contains(@href, "image")]').xpath('text()').extract()[0]
-                relative_url = site.css('//a[contains(@href, "image")]').xpath('@href').extract()[0]
+                item = DarklyricItem()
+                #print ("the css elements "+site.css("//a[contains(@href, 'a')]"))
+                item['name'] = site.xpath('text()').extract()
+                relative_url = site.xpath('@href').extract()[0]
                 item['RefLink'] = urljoin_rfc(base_url, relative_url)
                 items.append(item)
-                print repr(item).decode("unicode-escape") + '\n'
+            
+            #print repr(item).decode("unicode-escape") + '\n'
 
-            ColumnRight = sel.css('div.fr')
+            ColumnRight = sel.css('div.fr').xpath("//a[starts-with(@href, 'a')]")
             for site in ColumnRight:
-                item = DarkLyricItem()
-                item['name'] = site.css('//a[contains(@href, "image")]').xpath('text()').extract()[0]
-                relative_url = site.css('//a[contains(@href, "image")]').xpath('@href').extract()[0]
+                item = DarklyricItem()
+                item['name'] = site.xpath('text()').extract()
+                relative_url = site.xpath('@href').extract()[0]
                 item['RefLink'] = urljoin_rfc(base_url, relative_url)
                 items.append(item)
-                print repr(item).decode("unicode-escape") + '\n'
+            #print repr(item).decode("unicode-escape") + '\n'
 
             info('parsed '+str(response))
             return items
