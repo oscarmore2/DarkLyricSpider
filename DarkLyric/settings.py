@@ -14,6 +14,12 @@ BOT_NAME = 'DarkLyric'
 SPIDER_MODULES = ['DarkLyric.spiders']
 NEWSPIDER_MODULE = 'DarkLyric.spiders'
 
+ITEM_PIPELINES = {
+    'DarkLyric.pipelines.JsonWithEncodingDarkLyricsPipeLine' : 300,
+}
+
+LOG_LEVEL = 'INFO'
+
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'DarkLyric (+http://www.yourdomain.com)'

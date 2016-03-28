@@ -13,13 +13,12 @@ except:
         from DarkLyric.misc.log import *
 
 class DarkLyricSpider(CrawlSpider):
-        name = "Dark Lyric"
-        start_urls = ["darklyric.com/"+char(95)+".html"]
-        SubUrl = ""
-        maxpage = 40
+        name = "DarkLyric_A"
         chrStart = 97
         i = charStart
-        start_urls = ["http://www.darklyrics.com"]
+        start_urls = ["darklyric.com/"+char(i)+".html"]
+        
+        
         rules = [Rule(
                 sle(allow=(allow=(char(i)+".html")), follow=True, callback='parse_item'))
                 )]
@@ -34,6 +33,7 @@ class DarkLyricSpider(CrawlSpider):
             item = DarkLyricItem()
             item['name'] = site.css('//a[contains(@href, "image")]').xpath('text()').extract()[0]
             relative_url = site.css('//a[contains(@href, "image")]').xpath('@href').extract()[0]
+            item['RefLink'] = urljoin_rfc(base_url, relative_url)
             items.append(item)
             print repr(item).decode("unicode-escape") + '\n'
 
@@ -42,6 +42,7 @@ class DarkLyricSpider(CrawlSpider):
             item = DarkLyricItem()
             item['name'] = site.css('//a[contains(@href, "image")]').xpath('text()').extract()[0]
             relative_url = site.css('//a[contains(@href, "image")]').xpath('@href').extract()[0]
+            item['RefLink'] = urljoin_rfc(base_url, relative_url)
             items.append(item)
             print repr(item).decode("unicode-escape") + '\n'
 
