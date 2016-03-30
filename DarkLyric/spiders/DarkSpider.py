@@ -28,30 +28,85 @@ class DarkLyricSpider(CrawlSpider):
             items = []
             sel = Selector(response)
             base_url = get_base_url(response)
+            download_delay = 0.5
             CollumBase = sel.css('div.artists')
             ColumnLeft = CollumBase.css('div.fl').xpath("//a[starts-with(@href, 'a')]")
+
+            """
+            item = DarklyricItem()
+            relative_url = ColumnLeft[1].xpath('@href').extract()
+            relative_url = urljoin_rfc(base_url, relative_url)
+            request = Request (relative_url, callback=self.parse_artist)
+            yield request
+            item['artistName'] = ColumnLeft[0].xpath('text()').extract()[0]
+            item['RefLink'] = relative_url
+            item['ablums'] = request
+            items.append(item)
+            info('parsed '+str(response))
+            yield  items
+            """
             
-            for site in ColumnLeft:
+            
+            
+            
+            for site in ColumnLeft[0]:
                 item = DarklyricItem()
                 #print ("the css elements "+site.css("//a[contains(@href, 'a')]"))
-                item['name'] = site.xpath('text()').extract()
+                item['name'] = site.xpath('text()').extract()[0]
                 relative_url = site.xpath('@href').extract()[0]
                 item['RefLink'] = urljoin_rfc(base_url, relative_url)
+                request = Request (relative_url, callback=self.parse_artist)
+                yield request
                 items.append(item)
-            
-            #print repr(item).decode("unicode-escape") + '\n'
-
-            ColumnRight = sel.css('div.fr').xpath("//a[starts-with(@href, 'a')]")
-            for site in ColumnRight:
-                item = DarklyricItem()
-                item['name'] = site.xpath('text()').extract()
-                relative_url = site.xpath('@href').extract()[0]
-                item['RefLink'] = urljoin_rfc(base_url, relative_url)
-                items.append(item)
-            #print repr(item).decode("unicode-escape") + '\n'
 
             info('parsed '+str(response))
+            yield items
+            
+            #print repr(item).decode("unicode-escape") + '\n'
+            
+            
+ #           ColumnRight = sel.css('div.fr').xpath("//a[starts-with(@href, 'a')]")
+            """
+            for site in ColumnRight:
+                item = DarklyricItem()
+                item['name'] = site.xpath('text()').extract()[0  ]
+                relative_url = site.xpath('@href').extract()[0]
+                item['RefLink'] = urljoin_rfc(base_url, relative_url)
+                items.append(item)
+            #print repr(item).decode("unicode-escape") + '\n'
+            """
+            
+        
+        def parse_album(self, response):
+            items = []
+            mainContent = Selector (response)
+            base = get_base_url(response)
+            albumContent = mainContent.xpath("//div[@id='album']").extract
+            
+            for album in albumContent :
+                item = AlbumItem()
+                item['albumName'] = album.css('h2').css('strong').xpath('text()').extract[0]
+                rel_url = album.xpath("//a[starts-with(@href, '..\/lyrics')]")[0]
+                rel_url = urljoin_rfc(base, rel_url)
+                #request = Request(rel_url, callback = self.parse_song)
+                #yield request
+                item['RefLink'] = rel_url
+                item['songs'] = 'test'
+                items.append(item)
+            
+            info('parsed album '+str(response))
             return items
+        
+        def parse_song (self, response) :
+            items = []
+            mainContent = Selector(response)
+            songsItem = mainContent
+            item = SongItem()
+            
+            info('parsed song '+str(response))
+            return items
+        
+
 
         def _process_request(self, request):
             info('process '+str(request))
