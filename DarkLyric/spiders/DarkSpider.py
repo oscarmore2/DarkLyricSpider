@@ -8,7 +8,7 @@ from scrapy.utils.response import get_base_url
 from scrapy.utils.url import urljoin_rfc
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor as sle
-
+from scrapy.http import Request
 from DarkLyric.items import *
 from DarkLyric.misc.log import *
 
@@ -30,7 +30,7 @@ class DarkLyricSpider(CrawlSpider):
             base_url = get_base_url(response)
             download_delay = 0.5
             CollumBase = sel.css('div.artists')
-            ColumnLeft = CollumBase.css('div.fl').xpath("//a[starts-with(@href, 'a')]")
+            ColumnLeft = CollumBase.css('div.fl').xpath("//a[starts-with(@href, 'a/aa')]")
 
             """
             item = DarklyricItem()
@@ -47,20 +47,23 @@ class DarkLyricSpider(CrawlSpider):
             """
             
             
+            print (ColumnLeft)
             
-            
-            for site in ColumnLeft[0]:
+            for site in ColumnLeft:
                 item = DarklyricItem()
                 #print ("the css elements "+site.css("//a[contains(@href, 'a')]"))
-                item['name'] = site.xpath('text()').extract()[0]
+                item['artistName'] = site.xpath('text()').extract()
                 relative_url = site.xpath('@href').extract()[0]
-                item['RefLink'] = urljoin_rfc(base_url, relative_url)
-                request = Request (relative_url, callback=self.parse_artist)
-                yield request
+                relative_url = urljoin_rfc(base_url, relative_url)
+                item['RefLink'] = relative_url
+                request = Request (relative_url, callback=self.parse_album)
+                
+                item['albums'] = request
                 items.append(item)
+                
 
             info('parsed '+str(response))
-            yield items
+            return items
             
             #print repr(item).decode("unicode-escape") + '\n'
             
@@ -100,7 +103,8 @@ class DarkLyricSpider(CrawlSpider):
         def parse_song (self, response) :
             items = []
             mainContent = Selector(response)
-            songsItem = mainContent
+            songsItem = mainContent.css('lyric').extrect()
+            
             item = SongItem()
             
             info('parsed song '+str(response))
