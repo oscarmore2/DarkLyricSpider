@@ -13,7 +13,9 @@ class DarklyricItem (Item):
     # name = scrapy.Field()
     artistName = Field()
     RefLink = Field()
-    albums = Field()
+    albumName = Field()
+    songName = Field()
+    lyricContent = Field()
 
 class AlbumItem (Item) :
     albumName = Field()
