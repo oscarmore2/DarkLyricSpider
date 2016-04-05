@@ -16,10 +16,10 @@ import re
 class DarkLyricSpider(CrawlSpider):
         name = "DarkLyric"
         allowed_domains = ["darklyrics.com"]
-        start_urls = ["http://www.darklyrics.com"]
+        start_urls = ["http://www.darklyrics.com/lyrics/anthrax/fistfulofmetal.html"]
         
         
-        rules = [Rule(sle(allow=(".*\.html")), follow=True, callback='parse_item')
+        rules = [Rule(sle(allow=(".*\.html")), follow=True, callback='parse_song')
                 ]
                 
 
